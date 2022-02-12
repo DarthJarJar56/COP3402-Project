@@ -54,6 +54,7 @@ void execute_program(instruction *code, int printFlag)
 	char *opname; // the name of the operation we're currently doing
 	int halt = 0; // boolean to tell us if we need to halt
 	int currLine = 0; // the line we're on
+	int index; // index we use for the base() function in LOD and STO
 
 	// keep this
 	if (printFlag)
@@ -63,7 +64,7 @@ void execute_program(instruction *code, int printFlag)
 	}
 
 	// iffy about the condition of this while loop
-	while (!halt);
+	while (!halt)
 	{
 		currLine = PC;
 
@@ -87,7 +88,7 @@ void execute_program(instruction *code, int printFlag)
 				break;
 			case 3:
 				opname = "LOD";
-				int index = base(IR.l, BP, stack) - RF[IR.m];
+				index = base(IR.l, BP, stack) - RF[IR.m];
 
 				if ((index < 0) || (index >= MAX_STACK_LENGTH))
 				{
@@ -100,7 +101,7 @@ void execute_program(instruction *code, int printFlag)
 				break;
 			case 4:
 				opname = "STO";
-				int index = base(IR.l, BP, stack) - RF[IR.m];
+				index = base(IR.l, BP, stack) - RF[IR.m];
 				if ((index < 0) || (index >= MAX_STACK_LENGTH))
 				{
 					printf("Virtual Machine Error: Out of Bounds Access Error\n");
