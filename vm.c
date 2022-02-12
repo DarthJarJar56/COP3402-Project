@@ -51,8 +51,9 @@ void execute_program(instruction *code, int printFlag)
 	int *stack = calloc(MAX_STACK_LENGTH, sizeof(int));
 	int *RF = calloc(REG_FILE_SIZE, sizeof(int)); // register file
 
-	char *opname;
-	int halt = 0;
+	char *opname; // the name of the operation we're currently doing
+	int halt = 0; // boolean to tell us if we need to halt
+	int currLine = 0; // the line we're on
 
 	// keep this
 	if (printFlag)
@@ -62,8 +63,10 @@ void execute_program(instruction *code, int printFlag)
 	}
 
 	// iffy about the condition of this while loop
-	while (!halt)
+	while (!halt);
 	{
+		currLine = PC;
+
 		// fetch cycle
 		IR = code[PC];
 		PC++;
@@ -92,7 +95,8 @@ void execute_program(instruction *code, int printFlag)
 					halt = 1;
 				}
 
-				RF[IR.r] = stack[index];
+				SP = index;
+				RF[IR.r] = stack[SP];
 				break;
 			case 4:
 				opname = "STO";
@@ -103,7 +107,8 @@ void execute_program(instruction *code, int printFlag)
 					halt = 1;
 				}
 
-				stack[index] = RF[IR.r];
+				SP = index;
+				stack[SP] = RF[IR.r];
 				break;
 			case 5:
 				opname = "CAL";
@@ -211,6 +216,12 @@ void execute_program(instruction *code, int printFlag)
 				RF[IR.r] = (RF[IR.l] >= RF[IR.m]);
 				break;
 		}
+
+		if (printFlag)
+		{
+			print_execution(currLine, opname, IR, PC, BP, SP, stack, RF);
+		}
+
 	}
 
 	free(stack);
