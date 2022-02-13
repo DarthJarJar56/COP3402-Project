@@ -54,7 +54,7 @@ void execute_program(instruction *code, int printFlag)
 	char *opname; // the name of the operation we're currently doing
 	int halt = 0; // boolean to tell us if we need to halt
 	int currLine = 0; // the line we're on
-	int index; // index we use for the base() function in LOD and STO
+	int index = SP; // index we use for the base() function in LOD and STO
 
 	// keep this
 	if (printFlag)
@@ -63,10 +63,10 @@ void execute_program(instruction *code, int printFlag)
 		printf("Initial values:\t\t\t\t%d\t%d\t%d\n", PC, SP, BP);
 	}
 
-	// iffy about the condition of this while loop
 	while (!halt)
 	{
 		currLine = PC;
+		SP = index;
 
 		// fetch cycle
 		IR = code[PC];
@@ -77,14 +77,13 @@ void execute_program(instruction *code, int printFlag)
 		{
 			case 1:
 				opname = "LIT";
-				SP++;
-				stack[SP] = IR.m;
+				RF[IR.r] = IR.m;
 				break;
 			case 2:
 				opname = "RET";
 				SP = BP + 1;
-				BP = stack[SP+2]; // dynamic link?
-				PC = stack[SP+3]; // return address?
+				BP = stack[SP-2]; // dynamic link?
+				PC = stack[SP-3]; // return address?
 				break;
 			case 3:
 				opname = "LOD";
@@ -96,8 +95,7 @@ void execute_program(instruction *code, int printFlag)
 					halt = 1;
 				}
 
-				SP = index;
-				RF[IR.r] = stack[SP];
+				RF[IR.r] = stack[index];
 				break;
 			case 4:
 				opname = "STO";
@@ -108,15 +106,15 @@ void execute_program(instruction *code, int printFlag)
 					halt = 1;
 				}
 
-				SP = index;
-				stack[SP] = RF[IR.r];
+				stack[index] = RF[IR.r];
 				break;
 			case 5:
 				opname = "CAL";
-				stack[SP+1] = base(IR.l, BP, stack);
-				stack[SP+2] = BP;
-				stack[SP+3] = PC;
-				BP = SP + 1;
+				index = base(IR.l, BP, stack);
+				stack[SP-1] = index;
+				stack[SP-2] = BP;
+				stack[SP-3] = PC;
+				BP = SP - 1;
 				PC = IR.m;
 				break;
 			case 6:
@@ -139,11 +137,11 @@ void execute_program(instruction *code, int printFlag)
 				break;
 			case 9:
 				opname = "WRT";
-				printf("Writing value %d\n", RF[IR.r]);
+				printf("Write Value %d\n", RF[IR.r]);
 				break;
 			case 10:
 				opname = "RED";
-				printf("Enter the value for R: ");
+				printf("Please Enter a Value: ");
 				scanf("%d", &RF[IR.r]);
 				break;
 			case 11:
@@ -152,71 +150,55 @@ void execute_program(instruction *code, int printFlag)
 				break;
 			case 12:
 				opname = "NEG";
-				// negate the register R
 				RF[IR.r] = -1 * RF[IR.r];
 				break;
 			case 13:
 				opname = "ADD";
-				// add the registers L and M and store the result in register R
 				RF[IR.r] = RF[IR.l] + RF[IR.m];
 				break;
 			case 14:
 				opname = "SUB";
-				// subtract register M from register L (L-M) and store the result in register R
 				RF[IR.r] = RF[IR.l] - RF[IR.m];
 				break;
 			case 15:
 				opname = "MUL";
-				// multiply registers L and M and store the result in register R
 				RF[IR.r] = RF[IR.l] * RF[IR.m];
 				break;
 			case 16:
 				opname = "DIV";
-				// divide register L by register M (L/M) and store the result in register R
 				RF[IR.r] = RF[IR.l] / RF[IR.m];
 				break;
 			case 17:
 				opname = "MOD";
-				// set register R equal to register L modulo register M
 				RF[IR.r] = RF[IR.l] % RF[IR.m];
 				break;
 			case 18:
 				opname = "EQL";
-				// if register L equals register M, set register R to 1.
-				// otherwise, set register R to 0
 				RF[IR.r] = (RF[IR.l] == RF[IR.m]);
 				break;
 			case 19:
 				opname = "NEQ";
-				// if register L does not equal register M, set register R to 1.
-				// otherwise, set register R to 0.
 				RF[IR.r] = (RF[IR.l] != RF[IR.m]);
 				break;
 			case 20:
 				opname = "LSS";
-				// if register L is less than register M, set register R to 1.
-				// otherwise, set register R to 0.
 				RF[IR.r] = (RF[IR.l] < RF[IR.m]);
 				break;
 			case 21:
 				opname = "LEQ";
-				// if register L is less than or equal to register M, set register R to 1.
-				// otherwise, set register R to 0.
 				RF[IR.r] = (RF[IR.l] <= RF[IR.m]);
 				break;
 			case 22:
 				opname = "GTR";
-				// if register L is greater than register M, set register R to 1.
-				// otherwise, set register R to 0.
 				RF[IR.r] = (RF[IR.l] > RF[IR.m]);
 				break;
 			case 23:
 				opname = "GEQ";
-				// if register L is greater than or equal to register M, set register R to 1.
-				// otherwise, set register R to 0.
 				RF[IR.r] = (RF[IR.l] >= RF[IR.m]);
 				break;
 		}
+		
+		index = SP;
 
 		if (printFlag)
 		{
@@ -227,5 +209,4 @@ void execute_program(instruction *code, int printFlag)
 
 	free(stack);
 	free(RF);
-	free(opname);
 }
