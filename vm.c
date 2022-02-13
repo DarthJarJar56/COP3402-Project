@@ -137,12 +137,13 @@ void execute_program(instruction *code, int printFlag)
 				break;
 			case 9:
 				opname = "WRT";
-				printf("Write Value %d\n", RF[IR.r]);
+				printf("Write Value: %d\n", RF[IR.r]);
 				break;
 			case 10:
 				opname = "RED";
 				printf("Please Enter a Value: ");
 				scanf("%d", &RF[IR.r]);
+				printf("\n");
 				break;
 			case 11:
 				opname = "HAL";
