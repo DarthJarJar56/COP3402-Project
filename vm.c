@@ -146,7 +146,7 @@ void execute_program(instruction *code, int printFlag)
 				printf("\n");
 				break;
 			case 11:
-				opname = "HAL";
+				opname = "HLT";
 				halt = 1;
 				break;
 			case 12:
