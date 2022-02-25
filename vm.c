@@ -201,7 +201,10 @@ void execute_program(instruction *code, int printFlag)
 		
 		index = SP;
 
-		if (printFlag)
+		// conditions based on assignment posting "EDIT 2/17/22"
+		// if (printflag is true && (halt is not true || IR.opcode is HLT)), print
+		// HLT is opcode 11
+		if (printFlag && (!halt || IR.opcode == 11))
 		{
 			print_execution(currLine, opname, IR, PC, BP, SP, stack, RF);
 		}
