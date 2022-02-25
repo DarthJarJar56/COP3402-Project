@@ -1,7 +1,7 @@
 /*
-	You can use these two print statements for the errors:
-		printf("Virtual Machine Error: Stack Overflow Error\n");
-		printf("Virtual Machine Error: Out of Bounds Access Error\n");
+COP3402 Project 1
+vm.c
+Authors: A.J. Futo, Nathan Kofoed, Seif Sallam
 */
 
 #include <stdio.h>
