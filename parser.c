@@ -335,7 +335,8 @@ void program()
 	// check for error 1
 	if (tokens[lIndex].type != periodsym)
 	{
-		printparseerror(1);
+		error = 1;
+		printparseerror(error);
 		return;
 	}
 
@@ -349,11 +350,108 @@ void program()
 
 void block()
 {
+	level++;
+	int procIndex = tIndex - 1;
+	int x = var_declaration();
+	proc_declaration();
+	table[procIndex].addr = cIndex;
 
+	if (error == 0)
+	{
+		emit(6, 0, 0, x); // INC == 6
+		statement();
+		if (error == 0)
+		{
+			mark();
+			level++;
+		}
+	}
+
+	level--;
 }
 
+//        X  X  X  X  X  X
+// errors 2, 3, 4, 5, 6, 7
 int var_declaration()
 {
+	int memorysize = 3;
+	int arraysize;
+	char *symbolname;
+
+	if (tokens[lIndex].type == varsym)
+	{
+		do
+		{
+			lIndex++;
+			if (tokens[lIndex].type != identsym)
+			{
+				error = 2;
+				return 0;
+			}
+			
+			if (multipledeclarationcheck(tokens[lIndex].name) != -1)
+			{
+				error = 3;
+				return 0;
+			}
+
+			strcpy(symbolname, tokens[lIndex].name);
+			lIndex++;
+
+			if (tokens[lIndex].type == lbracketsym)
+			{
+				lIndex++;
+				if (tokens[lIndex].type != numbersym || tokens[lIndex].value == 0)
+				{
+					error = 4;
+					return 0;
+				}
+
+				arraysize = tokens[lIndex].value;
+
+				lIndex++;
+
+				if (tokens[lIndex].type == multsym || tokens[lIndex].type == divsym || 
+					tokens[lIndex].type == modsym || tokens[lIndex].type == addsym ||
+					tokens[lIndex].type == subsym)
+				{
+					error = 4;
+					return 0;
+				}
+				else if (tokens[lIndex].type != rbracketsym)
+				{
+					error = 5;
+					return 0;
+				}
+
+				lIndex++;
+
+				addToSymbolTable(2, symbolname, arraysize, level, memorysize, 0);
+				memorysize += arraysize;
+			}
+			else
+			{
+				addToSymbolTable(1, symbolname, 0, level, memorysize, 0);
+			}
+		} while (tokens[lIndex].type == commasym);
+		
+		if (tokens[lIndex].type == identsym)
+		{
+			error = 6;
+			return 0;
+		}
+		else if (tokens[lIndex].type != semicolonsym)
+		{
+			error = 7;
+			return 0;
+		}
+
+		lIndex++;
+	}
+	else
+	{
+	return memorysize;
+	}
 
 }
 
