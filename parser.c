@@ -15,11 +15,12 @@ int cIndex;
 symbol *table;
 int tIndex;
 
-lexeme *list;
-int lIndex;
+lexeme *tokens; // "list[]" in pseudocode
+int lIndex; // "listidx" in pseudocode
 
 int level;
 int registerCounter;
+int error = 0;
 
 // given functions
 void emit(int opname, int reg, int level, int mvalue);
@@ -32,6 +33,7 @@ void printsymboltable();
 void printassemblycode();
 
 // TODO: our functions
+void program();
 void block();
 int var_declaration();
 void proc_declaration();
@@ -48,7 +50,10 @@ instruction *parse(lexeme *list, int printTable, int printCode)
 	cIndex = 0;
 	table = malloc(sizeof(symbol) * MAX_SYMBOL_COUNT);
 	tIndex = 0;
-	
+	tokens = list;
+
+	program();
+
 	// print off table and code
 	if (printTable)
 		printsymboltable();
@@ -310,6 +315,38 @@ void printassemblycode()
 }
 
 // our functions
+
+void program()
+{
+	// directly from pseudocode
+	registerCounter = -1;
+	emit (7, 0, 0, 0);
+	addToSymbolTable(3, "main", 0, 0, 0, 0);
+	level = -1;
+	block();
+
+	// check for misc. errors
+	if (error != 0)
+	{
+		printparseerror(error);
+		return;
+	}
+
+	// check for error 1
+	if (tokens[lIndex].type != periodsym)
+	{
+		printparseerror(1);
+		return;
+	}
+
+	emit(11, 0, 0, 0); // 11 == HALT
+	code[0].m = table[0].addr;
+
+	for (int i = 0; i < cIndex; i++)
+		if (code[i].opcode == 5) // 5 == CAL
+			code[i].m = table[code[i].m].addr;
+}
+
 void block()
 {
 
