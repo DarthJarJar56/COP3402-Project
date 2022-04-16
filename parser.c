@@ -372,6 +372,8 @@ void block()
 
 //        X  X  X  X  X  X
 // errors 2, 3, 4, 5, 6, 7
+// returns 0 if we encounter an error
+// else, returns the number of memory spaces declared
 int var_declaration()
 {
 	int memorysize = 3;
@@ -455,9 +457,52 @@ int var_declaration()
 
 }
 
+//        X  X  X  X
+// errors 2, 3, 7, 8
 void proc_declaration()
 {
+	char *symbolname;
 
+	while (tokens[lIndex].type == procsym)
+	{
+		lIndex++;
+		if (tokens[lIndex].type != identsym)
+		{
+			error = 2;
+			return;
+		}
+		
+		if (multipledeclarationcheck(tokens[lIndex].name) != -1)
+		{
+			error = 3;
+			return;
+		}
+
+		strcpy(symbolname, tokens[lIndex].name);
+		lIndex++;
+
+		if (tokens[lIndex].type != semicolonsym)
+		{
+			error = 8;
+			return;
+		}
+
+		lIndex++;
+		addToSymbolTable(3, symbolname, 0, level, 0, 0);
+
+		block();
+
+		if (tokens[lIndex].type != semicolonsym)
+		{
+			error = 7;
+			return;
+		}	
+
+		lIndex++;
+
+		// emit RET
+		emit(2, 0, 0, 0);
+	}
 }
 
 void statement()
