@@ -15,7 +15,13 @@ int cIndex;
 symbol *table;
 int tIndex;
 
+lexeme *list;
+int lIndex;
 
+int level;
+int registerCounter;
+
+// given functions
 void emit(int opname, int reg, int level, int mvalue);
 void addToSymbolTable(int k, char n[], int s, int l, int a, int m);
 void mark();
@@ -24,6 +30,16 @@ int findsymbol(char name[], int kind);
 void printparseerror(int err_code);
 void printsymboltable();
 void printassemblycode();
+
+// TODO: our functions
+void block();
+int var_declaration();
+void proc_declaration();
+void statement();
+void condition();
+void expression();
+void term();
+void factor();
 
 instruction *parse(lexeme *list, int printTable, int printCode)
 {
@@ -291,4 +307,45 @@ void printassemblycode()
 	
 	if (table != NULL)
 		free(table);
+}
+
+// our functions
+void block()
+{
+
+}
+
+int var_declaration()
+{
+
+}
+
+void proc_declaration()
+{
+
+}
+
+void statement()
+{
+
+}
+
+void condition()
+{
+
+}
+
+void expression()
+{
+
+}
+
+void term()
+{
+
+}
+
+void factor()
+{
+
 }
