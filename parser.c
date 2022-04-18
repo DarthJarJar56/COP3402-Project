@@ -655,10 +655,11 @@ void statement()
 	}
 	if (tokens[lIndex].type == ifsym)
 	{
-		int jumpIndex;
+		int jmpIdx;
+		int jpcIdx;
 		lIndex++;
 		condition();
-		jumpIndex = cIndex;
+		jpcIdx = cIndex;
 		emit (8, registerCounter, 0, 0);
 		registerCounter--;
 		if (tokens[lIndex].type != questionsym)
@@ -671,15 +672,15 @@ void statement()
 		if (tokens[lIndex].type == colonsym)
 		{
 			lIndex++;
-			jumpIndex = cIndex;
+			jmpIdx = cIndex;
 			emit (7,0,0,0);
-			code[jumpIndex].m = cIndex;
+			code[jpcIdx].m = cIndex;
 			statement();
-			code[jumpIndex].m = cIndex;
+			code[jmpIdx].m = cIndex;
 		}
 		else
 		{
-			code[jumpIndex].m = cIndex;
+			code[jpcIdx].m = cIndex;
 		}
 		return;
 	}
