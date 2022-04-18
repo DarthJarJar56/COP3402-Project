@@ -421,8 +421,9 @@ int var_declaration()
 
 				lIndex++;
 
-				addToSymbolTable(2, symbolname, arraysize, level, memorysize, 0);
 				memorysize += arraysize;
+				addToSymbolTable(2, symbolname, arraysize, level, memorysize, 0);
+				// memorysize += arraysize;
 			}
 			else
 			{
