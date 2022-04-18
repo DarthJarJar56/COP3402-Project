@@ -507,25 +507,252 @@ void proc_declaration()
 
 void statement()
 {
-
+	
 }
 
 void condition()
 {
-
+	expression();
+	if (tokens[lIndex].type == eqlsym)
+	{
+		lIndex++;
+		expression();
+		emit(18, registerCounter - 1, registerCounter - 1, registerCounter);
+		registerCounter--;
+	}
+	else if (tokens[lIndex].type == neqsym)
+	{
+		lIndex++;
+		expression();
+		emit(19, registerCounter - 1, registerCounter - 1, registerCounter);
+		registerCounter--;
+	}
+	else if (tokens[lIndex].type == lsssym)
+	{
+		lIndex++;
+		expression();
+		emit(20, registerCounter - 1, registerCounter - 1, registerCounter);
+		registerCounter--;
+	}
+	else if (tokens[lIndex].type == leqsym)
+	{
+		lIndex++;
+		expression();
+		emit(21, registerCounter - 1, registerCounter - 1, registerCounter);
+		registerCounter--;
+	}
+	else if (tokens[lIndex].type == gtrsym)
+	{
+		lIndex++;
+		expression();
+		emit(22, registerCounter - 1, registerCounter - 1, registerCounter);
+		registerCounter--;
+	}
+	else if (tokens[lIndex].type == geqsym)
+	{
+		lIndex++;
+		expression();
+		emit(23, registerCounter - 1, registerCounter - 1, registerCounter);
+		registerCounter--;
+	}
+	else
+	{
+		error = 21;
+		return;
+	}
 }
 
 void expression()
 {
-
+	if (tokens[lIndex].type == subsym)
+	{
+		lIndex++;
+		term();
+		emit(12, registerCounter, 0, registerCounter);
+		while (tokens[lIndex].type == addsym || tokens[lIndex].type == subsym)
+		{
+			if (tokens[lIndex].type == addsym)
+			{
+				lIndex++;
+				term();
+				emit(13, registerCounter - 1, registerCounter - 1, registerCounter);
+				registerCounter--;
+			}
+			else
+			{
+				lIndex++;
+				term();
+				emit(14, registerCounter - 1, registerCounter - 1, registerCounter);
+				registerCounter--;
+			}
+		}
+	}
+	else
+	{
+		term();
+		while (tokens[lIndex].type == addsym || tokens[lIndex].type == subsym)
+		{
+			if (tokens[lIndex].type == addsym)
+			{
+				lIndex++;
+				term();
+				emit(13, registerCounter - 1, registerCounter - 1, registerCounter);
+				registerCounter--;
+			}
+			else
+			{
+				lIndex++;
+				term();
+				emit(14, registerCounter - 1, registerCounter - 1, registerCounter);
+				registerCounter--;
+			}
+		}
+		if (tokens[lIndex].type == lparenthesissym || tokens[lIndex].type == identsym || tokens[lIndex].type == numbersym)
+		{
+			error = 22;
+			return;
+		}
+	}
 }
 
 void term()
 {
-
+	factor();
+	while (tokens[lIndex].type == multsym || tokens[lIndex].type == divsym || tokens[lIndex].type == modsym)
+	{
+		if (tokens[lIndex].type = multsym)
+		{
+			lIndex++;
+			factor();
+			emit(15, registerCounter - 1, registerCounter - 1, registerCounter);
+			registerCounter--;
+		}
+		else if (tokens[lIndex].type == divsym)
+		{
+			lIndex++;
+			factor();
+			emit(16, registerCounter - 1, registerCounter - 1, registerCounter);
+			registerCounter--;
+		}
+		else 
+		{
+			lIndex++;
+			factor();
+			emit(17, registerCounter - 1, registerCounter - 1, registerCounter);
+			registerCounter--;
+		}
+	}
 }
 
 void factor()
 {
-
+	char * symbolname;
+	int symidx;
+	int arrayidxreg;
+	int varlocreg;
+	
+	if (tokens[lIndex].type == identsym)
+	{
+		strcpy(symbolname, tokens[lIndex].name);
+		lIndex++;
+		if (tokens[lIndex].type == lbracketsym)
+		{
+			lIndex++;
+			symidx = findsymbol(symbolname, 2);
+			if (symidx == -1)
+			{
+				if (findsymbol(symbolname, 1) != -1)
+				{
+					error = 11;
+					return;
+				}
+				else if (findsymbol(symbolname, 3) != -1)
+				{
+					error = 9;
+					return;
+				}
+				else
+				{
+					error = 10;
+					return;
+				}
+			}
+			expression();
+			arrayidxreg = registerCounter;
+			if (tokens[lIndex].type != rbracketsym)
+			{
+				error = 5;
+				return;
+			}
+			lIndex++;
+			registerCounter++;
+			if (registerCounter >= 10)
+			{
+				error = 14;
+				return;
+			}
+			emit(1, registerCounter, 0, table[symidx].addr);
+			emit(13, arrayidxreg, arrayidxreg, registerCounter);
+			registerCounter--;
+			emit(3, registerCounter, level - table[symidx].level, arrayidxreg);
+		}
+		else
+		{
+			symidx = findsymbol(symbolname, 1);
+			if (symidx == -1)
+			{
+				if (findsymbol(symbolname, 2) != -1)
+				{
+					error = 12;
+					return;
+				}
+				else if (findsymbol(symbolname, 3) != -1)
+				{
+					error = 9;
+					return;
+				}
+				else
+				{
+					error = 10;
+					return;
+				}
+			}
+			registerCounter++;
+			if (registerCounter >= 10)
+			{
+				error = 14;
+				return;
+			}
+			emit(1, registerCounter, 0, table[symidx].addr);
+			varlocreg = registerCounter;
+			emit(3, registerCounter, level - table[symidx].level, varlocreg);
+		}
+	}
+	else if (tokens[lIndex].type == numbersym)
+	{
+		registerCounter++;
+		if (registerCounter >= 10)
+		{
+			error = 14;
+			return;
+		}
+		emit(1, registerCounter, 0, tokens[lIndex].value);
+		lIndex++;
+	}
+	else if (tokens[lIndex].type == lparenthesissym)
+	{
+		lIndex++;
+		expression();
+		if (tokens[lIndex].type != rparenthesissym)
+		{
+			error = 23;
+			return;
+		}
+		lIndex++;
+	}
+	else
+	{
+		error = 24;
+		return;
+	}
 }
