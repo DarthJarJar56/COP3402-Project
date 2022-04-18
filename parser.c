@@ -599,6 +599,7 @@ void statement()
 			emit(4, registerCounter, level - table[symbIndex].level, varloc);
 			registerCounter -= 2;
 		}
+		return;
 	}
 
 	if(tokens[lIndex].type == callsym)
@@ -625,6 +626,7 @@ void statement()
 			emit(5,0,level-table[symbIndex].level, symbIndex);
 			lIndex++;
 		}
+		return;
 	}
 	if (tokens[lIndex].type == beginsym)
 	{
@@ -649,6 +651,7 @@ void statement()
 			}
 		}
 		lIndex++;
+		return;
 	}
 	if (tokens[lIndex].type == ifsym)
 	{
@@ -678,6 +681,7 @@ void statement()
 		{
 			code[jumpIndex].m = cIndex;
 		}
+		return;
 	}
 	if(tokens[lIndex].type == dosym)
 	{
@@ -701,6 +705,7 @@ void statement()
 		emit (1, registerCounter, 0, loopIndex);
 		emit (18, registerCounter - 1, registerCounter - 1, registerCounter);
 		registerCounter--;
+		return;
 	}
 	if (tokens[lIndex].type == readsym)
 	{
@@ -785,6 +790,7 @@ void statement()
 			emit(4, registerCounter, level - table[symbIndex].level, varloc);
 			registerCounter -= 2;
 		}
+		return;
 	}
 	if(tokens[lIndex].type == writesym)
 	{
@@ -792,6 +798,7 @@ void statement()
 		expression();
 		emit(9, registerCounter, 0, 0);
 		registerCounter--;
+		return;
 	}	
 }
 
