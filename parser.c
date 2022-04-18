@@ -527,7 +527,7 @@ void statement()
 				}
 				else
 				{
-					error = 10;
+					printparseerror(10);
 					return;
 				}
 			}
@@ -577,7 +577,7 @@ void statement()
 				}
 				else
 				{
-					error = 10;
+					printparseerror(10);
 					return;
 				}
 			}
@@ -619,7 +619,7 @@ void statement()
 			}
 			else
 			{
-				error = 10;
+				printparseerror(10);
 				return;
 			}
 			emit(5,0,level-table[symbIndex].level, symbIndex);
@@ -707,7 +707,7 @@ void statement()
 		lIndex++;
 		if (tokens[lIndex].type != identsym)
 		{
-			error = 20;
+			printparseerror(20);
 			return;
 		}
 		strcpy(symbolname, tokens[lIndex].name);
@@ -730,7 +730,7 @@ void statement()
 				}
 				else
 				{
-					error = 10;
+					printparseerror(10);
 					return;
 				}
 			}
@@ -771,7 +771,7 @@ void statement()
 				}
 				else
 				{
-					error = 10;
+					printparseerror(10);
 					return;
 				}
 			}
@@ -958,7 +958,7 @@ void factor()
 				}
 				else
 				{
-					error = 10;
+					printparseerror(10);
 					return;
 				}
 			}
@@ -998,7 +998,7 @@ void factor()
 				}
 				else
 				{
-					error = 10;
+					printparseerror(10);
 					return;
 				}
 			}
