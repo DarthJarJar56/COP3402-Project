@@ -421,13 +421,13 @@ int var_declaration()
 
 				lIndex++;
 
-				memorysize += arraysize;
 				addToSymbolTable(2, symbolname, arraysize, level, memorysize, 0);
-				// memorysize += arraysize;
+				memorysize += arraysize;
 			}
 			else
 			{
 				addToSymbolTable(1, symbolname, 0, level, memorysize, 0);
+				memorysize++;
 			}
 		} while (tokens[lIndex].type == commasym);
 		
