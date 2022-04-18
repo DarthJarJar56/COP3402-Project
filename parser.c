@@ -755,6 +755,12 @@ void statement()
 				printparseerror(14);
 				return;
 			}
+			emit(10, registerCounter, 0, 0);
+			if (registerCounter >= 10)
+			{
+				printparseerror(14);
+				return;
+			}
 			emit (1, registerCounter, 0, table[symbIndex].addr);
 			emit (13, arrayIndex, arrayIndex, registerCounter);
 			registerCounter--;
@@ -912,7 +918,7 @@ void expression()
 			}
 		}
 	}
-	
+
 	if (tokens[lIndex].type == lparenthesissym || tokens[lIndex].type == identsym || tokens[lIndex].type == numbersym)
 	{
 		printparseerror(22);
