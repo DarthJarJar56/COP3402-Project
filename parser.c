@@ -634,8 +634,8 @@ void statement()
 		if (tokens[lIndex].type != endsym)
 		{
 			token_type sym = tokens[lIndex].type;
-			if(sym != identsym || sym != callsym || sym != beginsym || 
-			   sym != ifsym || sym != dosym || sym != readsym || sym != writesym)
+			if(sym == identsym || sym == callsym || sym == beginsym || 
+			   sym == ifsym || sym == dosym || sym == readsym || sym == writesym)
 			{
 			   error = 16;
 			   return;
