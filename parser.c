@@ -623,9 +623,9 @@ void statement()
 				printparseerror(10);
 				return;
 			}
-			emit(5,0,level-table[symbIndex].level, symbIndex);
-			lIndex++;
 		}
+		emit(5,0,level-table[symbIndex].level, symbIndex);
+		lIndex++;
 		return;
 	}
 	if (tokens[lIndex].type == beginsym)
@@ -702,9 +702,10 @@ void statement()
 			printparseerror(14);
 			return;
 		}
-		emit (1, registerCounter, 0, loopIndex);
+		emit (1, registerCounter, 0, 0);
 		emit (18, registerCounter - 1, registerCounter - 1, registerCounter);
 		registerCounter--;
+		emit(8, registerCounter, 0, loopIndex);
 		return;
 	}
 	if (tokens[lIndex].type == readsym)
@@ -786,6 +787,16 @@ void statement()
 				printparseerror(14);
 				return;
 			}
+
+			emit(1, registerCounter, 0, table[symbIndex].addr);
+			varloc = registerCounter;
+			registerCounter++;
+			if (registerCounter >= 10)
+			{
+				printparseerror(14);
+				return;
+			}
+
 			emit(10,registerCounter, 0,0);
 			emit(4, registerCounter, level - table[symbIndex].level, varloc);
 			registerCounter -= 2;
