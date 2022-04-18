@@ -605,7 +605,7 @@ void statement()
 	if(tokens[lIndex].type == callsym)
 	{
 		lIndex++;
-		if (tokens[lIndex].type == identsym)
+		if (tokens[lIndex].type != identsym)
 		{
 			printparseerror(15);
 			return;
@@ -613,7 +613,7 @@ void statement()
 		symbIndex = findsymbol(tokens[lIndex].name, 3);
 		if(symbIndex == -1)
 		{
-			if(findsymbol(tokens[lIndex].name, 1) != -1 || findsymbol(tokens[lIndex].name, 2))
+			if(findsymbol(tokens[lIndex].name, 1) != -1 || findsymbol(tokens[lIndex].name, 2) != -1)
 			{
 				printparseerror(15);
 				return;
