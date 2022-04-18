@@ -43,14 +43,14 @@ void expression();
 void term();
 void factor();
 
-instruction *parse(lexeme *tokens, int printTable, int printCode)
+instruction *parse(lexeme *list, int printTable, int printCode)
 {
 	// set up program variables
 	code = malloc(sizeof(instruction) * MAX_CODE_LENGTH);
 	cIndex = 0;
 	table = malloc(sizeof(symbol) * MAX_SYMBOL_COUNT);
 	tIndex = 0;
-	tokens = tokens;
+	tokens = list;
 
 	program();
 
@@ -378,7 +378,7 @@ int var_declaration()
 {
 	int memorysize = 3;
 	int arraysize;
-	char *symbolname;
+	char *symbolname = malloc(sizeof(char) * 12);
 
 	if (tokens[lIndex].type == varsym)
 	{
@@ -461,7 +461,7 @@ int var_declaration()
 // errors 2, 3, 7, 8
 void proc_declaration()
 {
-	char *symbolname;
+	char *symbolname = malloc(sizeof(char) * 12);
 
 	while (tokens[lIndex].type == procsym)
 	{
@@ -507,14 +507,14 @@ void proc_declaration()
 
 void statement()
 {
-	char *symbolname;
+	char *symbolname = malloc(sizeof(char) * 12);
 	int symbIndex;
 	int arrayIndex;
 	int varloc;
 	if(tokens[lIndex].type == identsym)
 	{
 		
-		symbolname = tokens[lIndex].name;
+		strcpy(symbolname, tokens[lIndex].name);
 		lIndex++;
 		if(tokens[lIndex].type == lbracketsym)
 		{
@@ -719,7 +719,7 @@ void statement()
 			printparseerror(error);
 			return;
 		}
-		symbolname = tokens[lIndex].name;
+		strcpy(symbolname, tokens[lIndex].name);
 		lIndex++;
 		if (tokens[lIndex].type == lbracketsym)
 		{
@@ -925,7 +925,7 @@ void term()
 	factor();
 	while (tokens[lIndex].type == multsym || tokens[lIndex].type == divsym || tokens[lIndex].type == modsym)
 	{
-		if (tokens[lIndex].type = multsym)
+		if (tokens[lIndex].type == multsym)
 		{
 			lIndex++;
 			factor();
@@ -951,7 +951,7 @@ void term()
 
 void factor()
 {
-	char * symbolname;
+	char *symbolname = malloc(sizeof(char) * 12);
 	int symidx;
 	int arrayidxreg;
 	int varlocreg;
