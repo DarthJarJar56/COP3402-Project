@@ -604,7 +604,7 @@ void statement()
 		lIndex++;
 		if (tokens[lIndex].type == identsym)
 		{
-			printparseerror(15);
+			error = 15;
 			return;
 		}
 		symbIndex = findsymbol(tokens[lIndex].name, 3);
@@ -612,12 +612,12 @@ void statement()
 		{
 			if(findsymbol(tokens[lIndex].name, 1) != -1 || findsymbol(tokens[lIndex].name, 2))
 			{
-				printparseerror(15);
+				error = 15;
 				return;
 			}
 			else
 			{
-				printparseerror(10);
+				error = 10;
 				return;
 			}
 			emit(5,0,level-table[symbIndex].level, symbIndex);
@@ -637,11 +637,13 @@ void statement()
 			if(sym != identsym || sym != callsym || sym != beginsym || 
 			   sym != ifsym || sym != dosym || sym != readsym || sym != writesym)
 			{
-			   printparseerror(16);
+			   error = 16;
+			   return;
 		    }
 			else
 			{
-				printparseerror(17);
+				error = 17;
+				return;
 			}
 		}
 		lIndex++;
@@ -657,7 +659,6 @@ void statement()
 		if (tokens[lIndex].type != questionsym)
 		{
 			error = 18;
-			printparseerror(error);
 			return;
 		}
 		lIndex++;
@@ -685,7 +686,6 @@ void statement()
 		if (tokens[lIndex].type != whilesym)
 		{
 			error = 19;
-			printparseerror(error);
 			return;
 		}
 		lIndex++;
@@ -694,7 +694,6 @@ void statement()
 		if (registerCounter >= 10)
 		{
 			error = 14;
-			printparseerror(error);
 			return;
 		}
 		emit (1, registerCounter, 0, loopIndex);
@@ -707,7 +706,6 @@ void statement()
 		if (tokens[lIndex].type != identsym)
 		{
 			error = 20;
-			printparseerror(error);
 			return;
 		}
 		strcpy(symbolname, tokens[lIndex].name);
@@ -721,19 +719,16 @@ void statement()
 				if (findsymbol(symbolname, 1) != -1)
 				{
 					error = 11;
-					printparseerror(error);
 					return;
 				}
 				else if (findsymbol(symbolname, 3) != -1)
 				{
 					error = 9;
-					printparseerror(error);
 					return;
 				}
 				else
 				{
 					error = 10;
-					printparseerror(error);
 					return;
 				}
 			}
@@ -742,7 +737,6 @@ void statement()
 			if (tokens[lIndex].type != rbracketsym)
 			{
 				error = 5;
-				printparseerror(error);
 				return;
 			}
 			lIndex++;
@@ -750,7 +744,6 @@ void statement()
 			if (registerCounter >= 10)
 			{
 				error = 14;
-				printparseerror(error);
 				return;
 			}
 			emit (1, registerCounter, 0, table[symbIndex].addr);
@@ -767,19 +760,16 @@ void statement()
 				if (findsymbol(symbolname, 2) != -1)
 				{
 					error = 12;
-					printparseerror(error);
 					return;
 				}
 				else if (findsymbol(symbolname, 3) != -1)
 				{
 					error = 9;
-					printparseerror(error);
 					return;
 				}
 				else
 				{
 					error = 10;
-					printparseerror(error);
 					return;
 				}
 			}
@@ -787,7 +777,6 @@ void statement()
 			if (registerCounter >= 10)
 			{
 				error = 14;
-				printparseerror(error);
 				return;
 			}
 			emit(10,registerCounter, 0,0);
@@ -852,7 +841,6 @@ void condition()
 	else
 	{
 		error = 21;
-		printparseerror(error);
 		return;
 	}
 }
@@ -905,7 +893,6 @@ void expression()
 		if (tokens[lIndex].type == lparenthesissym || tokens[lIndex].type == identsym || tokens[lIndex].type == numbersym)
 		{
 			error = 22;
-			printparseerror(error);
 			return;
 		}
 	}
@@ -960,19 +947,16 @@ void factor()
 				if (findsymbol(symbolname, 1) != -1)
 				{
 					error = 11;
-					printparseerror(error);
 					return;
 				}
 				else if (findsymbol(symbolname, 3) != -1)
 				{
 					error = 9;
-					printparseerror(error);
 					return;
 				}
 				else
 				{
 					error = 10;
-					printparseerror(error);
 					return;
 				}
 			}
@@ -981,7 +965,6 @@ void factor()
 			if (tokens[lIndex].type != rbracketsym)
 			{
 				error = 5;
-				printparseerror(error);
 				return;
 			}
 			lIndex++;
@@ -989,7 +972,6 @@ void factor()
 			if (registerCounter >= 10)
 			{
 				error = 14;
-				printparseerror(error);
 				return;
 			}
 			emit(1, registerCounter, 0, table[symidx].addr);
@@ -1005,19 +987,16 @@ void factor()
 				if (findsymbol(symbolname, 2) != -1)
 				{
 					error = 12;
-					printparseerror(error);
 					return;
 				}
 				else if (findsymbol(symbolname, 3) != -1)
 				{
 					error = 9;
-					printparseerror(error);
 					return;
 				}
 				else
 				{
 					error = 10;
-					printparseerror(error);
 					return;
 				}
 			}
@@ -1025,7 +1004,6 @@ void factor()
 			if (registerCounter >= 10)
 			{
 				error = 14;
-				printparseerror(error);
 				return;
 			}
 			emit(1, registerCounter, 0, table[symidx].addr);
@@ -1039,7 +1017,6 @@ void factor()
 		if (registerCounter >= 10)
 		{
 			error = 14;
-			printparseerror(error);
 			return;
 		}
 		emit(1, registerCounter, 0, tokens[lIndex].value);
@@ -1052,7 +1029,6 @@ void factor()
 		if (tokens[lIndex].type != rparenthesissym)
 		{
 			error = 23;
-			printparseerror(error);
 			return;
 		}
 		lIndex++;
@@ -1060,7 +1036,6 @@ void factor()
 	else
 	{
 		error = 24;
-		printparseerror(error);
 		return;
 	}
 }
