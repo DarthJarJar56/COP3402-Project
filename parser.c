@@ -515,17 +515,17 @@ void statement()
 			{
 				if (findsymbol(symbolname, 1) != -1)
 				{
-					printparseerror(11);
+					error = 11;
 					return;
 				}
 				else if (findsymbol(symbolname, 3) != -1)
 				{
-					printparseerror(9);
+					error = 9;
 					return;
 				}
 				else
 				{
-					printparseerror(10);
+					error = 10;
 					return;
 				}
 			}
@@ -533,13 +533,13 @@ void statement()
 			arrayIndex = registerCounter;
 			if (tokens[lIndex].type != rbracketsym)
 			{
-				printparseerror(5);
+				error = 5;
 				return;
 			}
 			lIndex++;
 			if (tokens[lIndex].type != assignsym)
 			{
-				printparseerror(13);
+				error = 13;
 				return;
 			}
 
@@ -549,7 +549,7 @@ void statement()
 
 			if (registerCounter >= 10)
 			{
-				printparseerror(14);
+				error = 14;
 				return;
 			}
 			emit(1, registerCounter, 0, table[symbIndex].addr);
@@ -565,31 +565,31 @@ void statement()
 			{
 				if (findsymbol(symbolname, 2) != -1)
 				{
-					printparseerror(12);
+					error = 12;
 					return;
 				}
 				else if(findsymbol(symbolname, 3) != -1)
 				{
-					printparseerror(9);
+					error = 9;
 					return;
 				}
 				else
 				{
-					printparseerror(10);
+					error = 10;
 					return;
 				}
 			}
 			registerCounter++;
 			if (registerCounter >= 10)
 			{
-				printparseerror(14);
+				error = 14;
 				return;
 			}
 			emit(1,registerCounter, 0, table[symbIndex].addr);
 			varloc = registerCounter;
 			if (tokens[lIndex].type != assignsym)
 			{
-				printparseerror(13);
+				error = 13;
 				return;
 			}
 			lIndex++;
