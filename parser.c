@@ -911,11 +911,12 @@ void expression()
 				registerCounter--;
 			}
 		}
-		if (tokens[lIndex].type == lparenthesissym || tokens[lIndex].type == identsym || tokens[lIndex].type == numbersym)
-		{
-			printparseerror(22);
-			return;
-		}
+	}
+	
+	if (tokens[lIndex].type == lparenthesissym || tokens[lIndex].type == identsym || tokens[lIndex].type == numbersym)
+	{
+		printparseerror(22);
+		return;
 	}
 }
 
