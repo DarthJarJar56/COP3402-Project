@@ -322,7 +322,7 @@ void program()
 {
 	// directly from pseudocode
 	registerCounter = -1;
-	emit (7, 0, 0, 0);
+	emit(7, 0, 0, 0);
 	addToSymbolTable(3, "main", 0, 0, 0, 0);
 	level = -1;
 	block();
@@ -557,7 +557,7 @@ void statement()
 			emit(1, registerCounter, 0, table[symbIndex].addr);
 			emit(13, arrayIndex, arrayIndex, registerCounter);
 			registerCounter--;
-			emit (4, registerCounter, level - table[symbIndex].level, arrayIndex);
+			emit(4, registerCounter, level - table[symbIndex].level, arrayIndex);
 			registerCounter -= 2;
 		}
 		else
@@ -660,7 +660,7 @@ void statement()
 		lIndex++;
 		condition();
 		jpcIdx = cIndex;
-		emit (8, registerCounter, 0, 0);
+		emit(8, registerCounter, 0, 0);
 		registerCounter--;
 		if (tokens[lIndex].type != questionsym)
 		{
@@ -673,7 +673,7 @@ void statement()
 		{
 			lIndex++;
 			jmpIdx = cIndex;
-			emit (7,0,0,0);
+			emit(7,0,0,0);
 			code[jpcIdx].m = cIndex;
 			statement();
 			code[jmpIdx].m = cIndex;
@@ -703,8 +703,8 @@ void statement()
 			printparseerror(14);
 			return;
 		}
-		emit (1, registerCounter, 0, 0);
-		emit (18, registerCounter - 1, registerCounter - 1, registerCounter);
+		emit(1, registerCounter, 0, 0);
+		emit(18, registerCounter - 1, registerCounter - 1, registerCounter);
 		registerCounter--;
 		emit(8, registerCounter, 0, loopIndex);
 		return;
@@ -756,15 +756,16 @@ void statement()
 				return;
 			}
 			emit(10, registerCounter, 0, 0);
+			registerCounter++;
 			if (registerCounter >= 10)
 			{
 				printparseerror(14);
 				return;
 			}
-			emit (1, registerCounter, 0, table[symbIndex].addr);
-			emit (13, arrayIndex, arrayIndex, registerCounter);
+			emit(1, registerCounter, 0, table[symbIndex].addr);
+			emit(13, arrayIndex, arrayIndex, registerCounter);
 			registerCounter--;
-			emit (4, registerCounter, level - table[symbIndex].level, arrayIndex);
+			emit(4, registerCounter, level - table[symbIndex].level, arrayIndex);
 			registerCounter -= 2;
 		}
 		else
