@@ -209,6 +209,8 @@ void printparseerror(int err_code)
 	
 	free(code);
 	free(table);
+
+	exit(-1);
 }
 
 void printsymboltable()
