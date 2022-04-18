@@ -356,16 +356,9 @@ void block()
 	proc_declaration();
 	table[procIndex].addr = cIndex;
 
-	if (error == 0)
-	{
-		emit(6, 0, 0, x); // INC == 6
-		statement();
-		if (error == 0)
-		{
-			mark();
-			level++;
-		}
-	}
+	emit(6, 0, 0, x); // INC == 6
+	statement();
+	mark();
 
 	level--;
 }
@@ -450,11 +443,8 @@ int var_declaration()
 
 		lIndex++;
 	}
-	else
-	{
-	return memorysize;
-	}
 
+	return memorysize;
 }
 
 //        X  X  X  X
