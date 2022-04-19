@@ -43,14 +43,14 @@ void expression();
 void term();
 void factor();
 
-instruction *parse(lexeme *tokens, int printTable, int printCode)
+instruction *parse(lexeme *list, int printTable, int printCode)
 {
 	// set up program variables
 	code = malloc(sizeof(instruction) * MAX_CODE_LENGTH);
 	cIndex = 0;
 	table = malloc(sizeof(symbol) * MAX_SYMBOL_COUNT);
 	tIndex = 0;
-	tokens = tokens;
+	tokens = list;
 
 	program();
 
@@ -209,6 +209,8 @@ void printparseerror(int err_code)
 	
 	free(code);
 	free(table);
+
+	exit(0);
 }
 
 void printsymboltable()
@@ -320,7 +322,7 @@ void program()
 {
 	// directly from pseudocode
 	registerCounter = -1;
-	emit (7, 0, 0, 0);
+	emit(7, 0, 0, 0);
 	addToSymbolTable(3, "main", 0, 0, 0, 0);
 	level = -1;
 	block();
@@ -335,7 +337,7 @@ void program()
 	// check for error 1
 	if (tokens[lIndex].type != periodsym)
 	{
-		error = 1;
+		printparseerror(1);
 		printparseerror(error);
 		return;
 	}
@@ -356,16 +358,9 @@ void block()
 	proc_declaration();
 	table[procIndex].addr = cIndex;
 
-	if (error == 0)
-	{
-		emit(6, 0, 0, x); // INC == 6
-		statement();
-		if (error == 0)
-		{
-			mark();
-			level++;
-		}
-	}
+	emit(6, 0, 0, x); // INC == 6
+	statement();
+	mark();
 
 	level--;
 }
@@ -378,7 +373,7 @@ int var_declaration()
 {
 	int memorysize = 3;
 	int arraysize;
-	char *symbolname;
+	char *symbolname = malloc(sizeof(char) * 12);
 
 	if (tokens[lIndex].type == varsym)
 	{
@@ -387,13 +382,13 @@ int var_declaration()
 			lIndex++;
 			if (tokens[lIndex].type != identsym)
 			{
-				error = 2;
+				printparseerror(2);
 				return 0;
 			}
 			
 			if (multipledeclarationcheck(tokens[lIndex].name) != -1)
 			{
-				error = 3;
+				printparseerror(3);
 				return 0;
 			}
 
@@ -405,7 +400,7 @@ int var_declaration()
 				lIndex++;
 				if (tokens[lIndex].type != numbersym || tokens[lIndex].value == 0)
 				{
-					error = 4;
+					printparseerror(4);
 					return 0;
 				}
 
@@ -417,12 +412,12 @@ int var_declaration()
 					tokens[lIndex].type == modsym || tokens[lIndex].type == addsym ||
 					tokens[lIndex].type == subsym)
 				{
-					error = 4;
+					printparseerror(4);
 					return 0;
 				}
 				else if (tokens[lIndex].type != rbracketsym)
 				{
-					error = 5;
+					printparseerror(5);
 					return 0;
 				}
 
@@ -434,47 +429,45 @@ int var_declaration()
 			else
 			{
 				addToSymbolTable(1, symbolname, 0, level, memorysize, 0);
+				memorysize++;
 			}
 		} while (tokens[lIndex].type == commasym);
 		
 		if (tokens[lIndex].type == identsym)
 		{
-			error = 6;
+			printparseerror(6);
 			return 0;
 		}
 		else if (tokens[lIndex].type != semicolonsym)
 		{
-			error = 7;
+			printparseerror(7);
 			return 0;
 		}
 
 		lIndex++;
 	}
-	else
-	{
-	return memorysize;
-	}
 
+	return memorysize;
 }
 
 //        X  X  X  X
 // errors 2, 3, 7, 8
 void proc_declaration()
 {
-	char *symbolname;
+	char *symbolname = malloc(sizeof(char) * 12);
 
 	while (tokens[lIndex].type == procsym)
 	{
 		lIndex++;
 		if (tokens[lIndex].type != identsym)
 		{
-			error = 2;
+			printparseerror(2);
 			return;
 		}
 		
 		if (multipledeclarationcheck(tokens[lIndex].name) != -1)
 		{
-			error = 3;
+			printparseerror(3);
 			return;
 		}
 
@@ -483,7 +476,7 @@ void proc_declaration()
 
 		if (tokens[lIndex].type != semicolonsym)
 		{
-			error = 8;
+			printparseerror(8);
 			return;
 		}
 
@@ -494,7 +487,7 @@ void proc_declaration()
 
 		if (tokens[lIndex].type != semicolonsym)
 		{
-			error = 7;
+			printparseerror(7);
 			return;
 		}	
 
@@ -507,14 +500,14 @@ void proc_declaration()
 
 void statement()
 {
-	char *symbolname;
+	char *symbolname = malloc(sizeof(char) * 12);
 	int symbIndex;
 	int arrayIndex;
 	int varloc;
 	if(tokens[lIndex].type == identsym)
 	{
 		
-		symbolname = tokens[lIndex].name;
+		strcpy(symbolname, tokens[lIndex].name);
 		lIndex++;
 		if(tokens[lIndex].type == lbracketsym)
 		{
@@ -564,7 +557,7 @@ void statement()
 			emit(1, registerCounter, 0, table[symbIndex].addr);
 			emit(13, arrayIndex, arrayIndex, registerCounter);
 			registerCounter--;
-			emit (4, registerCounter, level - table[symbIndex].level, arrayIndex);
+			emit(4, registerCounter, level - table[symbIndex].level, arrayIndex);
 			registerCounter -= 2;
 		}
 		else
@@ -606,12 +599,13 @@ void statement()
 			emit(4, registerCounter, level - table[symbIndex].level, varloc);
 			registerCounter -= 2;
 		}
+		return;
 	}
 
 	if(tokens[lIndex].type == callsym)
 	{
 		lIndex++;
-		if (tokens[lIndex].type == identsym)
+		if (tokens[lIndex].type != identsym)
 		{
 			printparseerror(15);
 			return;
@@ -619,7 +613,7 @@ void statement()
 		symbIndex = findsymbol(tokens[lIndex].name, 3);
 		if(symbIndex == -1)
 		{
-			if(findsymbol(tokens[lIndex].name, 1) != -1 || findsymbol(tokens[lIndex].name, 2))
+			if(findsymbol(tokens[lIndex].name, 1) != -1 || findsymbol(tokens[lIndex].name, 2) != -1)
 			{
 				printparseerror(15);
 				return;
@@ -629,9 +623,10 @@ void statement()
 				printparseerror(10);
 				return;
 			}
-			emit(5,0,level-table[symbIndex].level, symbIndex);
-			lIndex++;
 		}
+		emit(5,0,level-table[symbIndex].level, symbIndex);
+		lIndex++;
+		return;
 	}
 	if (tokens[lIndex].type == beginsym)
 	{
@@ -643,30 +638,33 @@ void statement()
 		if (tokens[lIndex].type != endsym)
 		{
 			token_type sym = tokens[lIndex].type;
-			if(sym != identsym || sym != callsym || sym != beginsym || 
-			   sym != ifsym || sym != dosym || sym != readsym || sym != writesym)
+			if(sym == identsym || sym == callsym || sym == beginsym || 
+			   sym == ifsym || sym == dosym || sym == readsym || sym == writesym)
 			{
 			   printparseerror(16);
+			   return;
 		    }
 			else
 			{
 				printparseerror(17);
+				return;
 			}
 		}
 		lIndex++;
+		return;
 	}
 	if (tokens[lIndex].type == ifsym)
 	{
-		int jumpIndex;
+		int jmpIdx;
+		int jpcIdx;
 		lIndex++;
 		condition();
-		jumpIndex = cIndex;
-		emit (8, registerCounter, 0, 0);
+		jpcIdx = cIndex;
+		emit(8, registerCounter, 0, 0);
 		registerCounter--;
 		if (tokens[lIndex].type != questionsym)
 		{
-			error = 18;
-			printparseerror(error);
+			printparseerror(18);
 			return;
 		}
 		lIndex++;
@@ -674,16 +672,17 @@ void statement()
 		if (tokens[lIndex].type == colonsym)
 		{
 			lIndex++;
-			jumpIndex = cIndex;
-			emit (7,0,0,0);
-			code[jumpIndex].m = cIndex;
+			jmpIdx = cIndex;
+			emit(7,0,0,0);
+			code[jpcIdx].m = cIndex;
 			statement();
-			code[jumpIndex].m = cIndex;
+			code[jmpIdx].m = cIndex;
 		}
 		else
 		{
-			code[jumpIndex].m = cIndex;
+			code[jpcIdx].m = cIndex;
 		}
+		return;
 	}
 	if(tokens[lIndex].type == dosym)
 	{
@@ -693,8 +692,7 @@ void statement()
 		statement();
 		if (tokens[lIndex].type != whilesym)
 		{
-			error = 19;
-			printparseerror(error);
+			printparseerror(19);
 			return;
 		}
 		lIndex++;
@@ -702,24 +700,24 @@ void statement()
 		registerCounter++;
 		if (registerCounter >= 10)
 		{
-			error = 14;
-			printparseerror(error);
+			printparseerror(14);
 			return;
 		}
-		emit (1, registerCounter, 0, loopIndex);
-		emit (18, registerCounter - 1, registerCounter - 1, registerCounter);
+		emit(1, registerCounter, 0, 0);
+		emit(18, registerCounter - 1, registerCounter - 1, registerCounter);
 		registerCounter--;
+		emit(8, registerCounter, 0, loopIndex);
+		return;
 	}
 	if (tokens[lIndex].type == readsym)
 	{
 		lIndex++;
 		if (tokens[lIndex].type != identsym)
 		{
-			error = 20;
-			printparseerror(error);
+			printparseerror(20);
 			return;
 		}
-		symbolname = tokens[lIndex].name;
+		strcpy(symbolname, tokens[lIndex].name);
 		lIndex++;
 		if (tokens[lIndex].type == lbracketsym)
 		{
@@ -729,20 +727,17 @@ void statement()
 			{
 				if (findsymbol(symbolname, 1) != -1)
 				{
-					error = 11;
-					printparseerror(error);
+					printparseerror(11);
 					return;
 				}
 				else if (findsymbol(symbolname, 3) != -1)
 				{
-					error = 9;
-					printparseerror(error);
+					printparseerror(9);
 					return;
 				}
 				else
 				{
-					error = 10;
-					printparseerror(error);
+					printparseerror(10);
 					return;
 				}
 			}
@@ -750,22 +745,27 @@ void statement()
 			arrayIndex = registerCounter;
 			if (tokens[lIndex].type != rbracketsym)
 			{
-				error = 5;
-				printparseerror(error);
+				printparseerror(5);
 				return;
 			}
 			lIndex++;
 			registerCounter++;
 			if (registerCounter >= 10)
 			{
-				error = 14;
-				printparseerror(error);
+				printparseerror(14);
 				return;
 			}
-			emit (1, registerCounter, 0, table[symbIndex].addr);
-			emit (13, arrayIndex, arrayIndex, registerCounter);
+			emit(10, registerCounter, 0, 0);
+			registerCounter++;
+			if (registerCounter >= 10)
+			{
+				printparseerror(14);
+				return;
+			}
+			emit(1, registerCounter, 0, table[symbIndex].addr);
+			emit(13, arrayIndex, arrayIndex, registerCounter);
 			registerCounter--;
-			emit (4, registerCounter, level - table[symbIndex].level, arrayIndex);
+			emit(4, registerCounter, level - table[symbIndex].level, arrayIndex);
 			registerCounter -= 2;
 		}
 		else
@@ -775,34 +775,41 @@ void statement()
 			{
 				if (findsymbol(symbolname, 2) != -1)
 				{
-					error = 12;
-					printparseerror(error);
+					printparseerror(12);
 					return;
 				}
 				else if (findsymbol(symbolname, 3) != -1)
 				{
-					error = 9;
-					printparseerror(error);
+					printparseerror(9);
 					return;
 				}
 				else
 				{
-					error = 10;
-					printparseerror(error);
+					printparseerror(10);
 					return;
 				}
 			}
 			registerCounter++;
 			if (registerCounter >= 10)
 			{
-				error = 14;
-				printparseerror(error);
+				printparseerror(14);
 				return;
 			}
+
+			emit(1, registerCounter, 0, table[symbIndex].addr);
+			varloc = registerCounter;
+			registerCounter++;
+			if (registerCounter >= 10)
+			{
+				printparseerror(14);
+				return;
+			}
+
 			emit(10,registerCounter, 0,0);
 			emit(4, registerCounter, level - table[symbIndex].level, varloc);
 			registerCounter -= 2;
 		}
+		return;
 	}
 	if(tokens[lIndex].type == writesym)
 	{
@@ -810,6 +817,7 @@ void statement()
 		expression();
 		emit(9, registerCounter, 0, 0);
 		registerCounter--;
+		return;
 	}	
 }
 
@@ -860,8 +868,7 @@ void condition()
 	}
 	else
 	{
-		error = 21;
-		printparseerror(error);
+		printparseerror(21);
 		return;
 	}
 }
@@ -911,12 +918,12 @@ void expression()
 				registerCounter--;
 			}
 		}
-		if (tokens[lIndex].type == lparenthesissym || tokens[lIndex].type == identsym || tokens[lIndex].type == numbersym)
-		{
-			error = 22;
-			printparseerror(error);
-			return;
-		}
+	}
+
+	if (tokens[lIndex].type == lparenthesissym || tokens[lIndex].type == identsym || tokens[lIndex].type == numbersym)
+	{
+		printparseerror(22);
+		return;
 	}
 }
 
@@ -925,7 +932,7 @@ void term()
 	factor();
 	while (tokens[lIndex].type == multsym || tokens[lIndex].type == divsym || tokens[lIndex].type == modsym)
 	{
-		if (tokens[lIndex].type = multsym)
+		if (tokens[lIndex].type == multsym)
 		{
 			lIndex++;
 			factor();
@@ -951,7 +958,7 @@ void term()
 
 void factor()
 {
-	char * symbolname;
+	char *symbolname = malloc(sizeof(char) * 12);
 	int symidx;
 	int arrayidxreg;
 	int varlocreg;
@@ -968,20 +975,17 @@ void factor()
 			{
 				if (findsymbol(symbolname, 1) != -1)
 				{
-					error = 11;
-					printparseerror(error);
+					printparseerror(11);
 					return;
 				}
 				else if (findsymbol(symbolname, 3) != -1)
 				{
-					error = 9;
-					printparseerror(error);
+					printparseerror(9);
 					return;
 				}
 				else
 				{
-					error = 10;
-					printparseerror(error);
+					printparseerror(10);
 					return;
 				}
 			}
@@ -989,16 +993,14 @@ void factor()
 			arrayidxreg = registerCounter;
 			if (tokens[lIndex].type != rbracketsym)
 			{
-				error = 5;
-				printparseerror(error);
+				printparseerror(5);
 				return;
 			}
 			lIndex++;
 			registerCounter++;
 			if (registerCounter >= 10)
 			{
-				error = 14;
-				printparseerror(error);
+				printparseerror(14);
 				return;
 			}
 			emit(1, registerCounter, 0, table[symidx].addr);
@@ -1013,28 +1015,24 @@ void factor()
 			{
 				if (findsymbol(symbolname, 2) != -1)
 				{
-					error = 12;
-					printparseerror(error);
+					printparseerror(12);
 					return;
 				}
 				else if (findsymbol(symbolname, 3) != -1)
 				{
-					error = 9;
-					printparseerror(error);
+					printparseerror(9);
 					return;
 				}
 				else
 				{
-					error = 10;
-					printparseerror(error);
+					printparseerror(10);
 					return;
 				}
 			}
 			registerCounter++;
 			if (registerCounter >= 10)
 			{
-				error = 14;
-				printparseerror(error);
+				printparseerror(14);
 				return;
 			}
 			emit(1, registerCounter, 0, table[symidx].addr);
@@ -1047,8 +1045,7 @@ void factor()
 		registerCounter++;
 		if (registerCounter >= 10)
 		{
-			error = 14;
-			printparseerror(error);
+			printparseerror(14);
 			return;
 		}
 		emit(1, registerCounter, 0, tokens[lIndex].value);
@@ -1060,16 +1057,14 @@ void factor()
 		expression();
 		if (tokens[lIndex].type != rparenthesissym)
 		{
-			error = 23;
-			printparseerror(error);
+			printparseerror(23);
 			return;
 		}
 		lIndex++;
 	}
 	else
 	{
-		error = 24;
-		printparseerror(error);
+		printparseerror(24);
 		return;
 	}
 }

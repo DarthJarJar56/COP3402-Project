@@ -2,7 +2,7 @@
 CC = gcc
 
 # List all your .c (or .cpp or .cc) files here (source files, excluding header files)
-SRC_CODE = driver.c lex.o parser.o vm.c
+SRC_CODE = driver.c lex.o parser.c vm.o
 
 #################################
 

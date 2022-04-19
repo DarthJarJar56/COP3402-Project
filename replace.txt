@@ -1,0 +1,2 @@
+find: error = ([0-99]*);
+replace: printparseerror($1);
