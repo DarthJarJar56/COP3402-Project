@@ -1,3 +1,9 @@
+/*
+COP3402 Project 3
+parser.c
+Authors: A.J. Futo, Nathan Kofoed, Seif Sallam
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
