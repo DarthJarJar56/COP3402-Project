@@ -460,3 +460,20 @@ else
 		echo "───==≡≡ΣΣ((( つºل͜º)つ"
 	fi
 fi
+
+echo -n "Hardest Test : "
+./a.out hardest.txt -a -s > output.txt
+executed=$?
+if [[ $executed !=  0 ]]; then
+	echo ":'("
+	exit 1
+else
+	diff -w -B output.txt hardestout.txt &> /dev/null
+	correct=$?
+	if [[ $correct != 0 ]]; then
+		echo ":'("
+		exit 1
+	else
+		echo "───==≡≡ΣΣ((( つºل͜º)つ"
+	fi
+fi
