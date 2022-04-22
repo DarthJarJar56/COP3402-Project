@@ -3,3 +3,6 @@ This project was completed during the Spring 2022 semester for Dr. Ali Almalki's
 
 # Authors
 A.J. Futo, Nathan Kofoed, Seif Sallam
+
+# Changes made to source code
+Added `exit(0);` at the end of `printparseerror()` to stop executing code immediately after encountering an error.
